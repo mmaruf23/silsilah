@@ -1,6 +1,5 @@
 import type { ErrorHandler, NotFoundHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import z, { ZodError } from 'zod';
 
 export const errorHandler: ErrorHandler = (err, c) => {
   if (!(err instanceof HTTPException)) {

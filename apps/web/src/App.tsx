@@ -1,11 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import { hc } from 'hono/client';
+import type { AppType } from '@apps/api';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState<string>('Belom hello');
 
+  useEffect(() => {
+    const client = hc<AppType>('http://localhost:8787/');
+    (async () => {
+      const res = await client.index.$get();
+      if (!res.ok) return;
+      const data = await res.text();
+      setMessage(data);
+    })();
+  }, []);
   return (
     <>
       <div>
@@ -17,6 +29,8 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
+      <h1>{message}</h1>
+      <h1></h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -29,7 +43,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
