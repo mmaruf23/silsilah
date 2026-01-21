@@ -1,0 +1,36 @@
+@url = http://localhost:8787
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaWZhc2VsbGEiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2NzYzMzI5N30.7PAre4JoNKgC4vAgIFEIWGrKHhDMY-nYx_RjfOHwKE8
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc2NzYyOTYxNH0.-obv_Lsnsd7ckFKNYAlSYH0bIN7z8WNaGUb5Dr3CuYg
+
+### REGISTER
+POST {{url}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "rifasella",
+  "password": "rahasia"
+}
+
+### LOGIN
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "rifasella",
+  "password": "rahasia"
+}
+
+### GET MY PROFILE
+GET {{url}}/user/me
+Authorization: Bearer {{token}}
+
+### GET ALL USER (admin)
+GET {{url}}/user?limit=2
+Authorization: Bearer {{tokenAdmin}}
+
+### GET PERSON BY ID (login)
+GET {{url}}/person/w
+Authorization: Bearer {{token}}
+
+### GET ALL PERSON + FILTER
+GET {{url}}/person?name=yuki

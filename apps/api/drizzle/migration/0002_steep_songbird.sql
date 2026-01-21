@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `name_address_unique_constraint` ON `persons` (`name`,`address`);
