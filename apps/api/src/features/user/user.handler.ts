@@ -22,15 +22,15 @@ export const userRoutes = new Hono()
     });
   })
   /** todo :
-   * - bikin implement pagination,
-   * - authorize hanya khusus admin
+   * [ ] bikin implement pagination,
+   * [x] authorize hanya khusus admin
    *  */
 
   .get(
     '/',
     jwtMiddleware,
     adminMiddleware,
-    zValidator('query', limitOffsetSchema),
+    zValidator('query', limitOffsetSchema), // todo : ganti jadi validator biasa aja, yang udah ada
     async (c) => {
       const { limit, offset } = c.req.valid('query');
       const data = await userService.getAllUser(limit, offset);

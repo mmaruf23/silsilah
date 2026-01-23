@@ -8,7 +8,7 @@ import {
 import { testClient } from 'hono/testing';
 import app from '@/index';
 
-describe('login test', () => {
+describe('auth test', () => {
   beforeAll(async () => {
     await env.DB.prepare(queryCreatePersonTable).run();
     await env.DB.prepare(queryCreateUserTable).run();
@@ -35,7 +35,7 @@ describe('login test', () => {
     }
   });
 
-  it('should login success', async () => {
+  it('should suceess login', async () => {
     const res = await client.auth.login.$post({
       json: {
         username: 'rifasella',

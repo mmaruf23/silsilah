@@ -22,5 +22,3 @@ export const updatePersonSchema = z.object({
   birthDate: z.iso.date().optional(),
   deathDate: z.iso.date().optional(),
 });
-
-// todo : test input person pake birthdate / deathdate, pengen tahu gimana cara kasih inputnya lewat request body
