@@ -62,12 +62,14 @@ const addPerson = async (_person: PersonInsert) => {
 const editPerson = async (id: number, _person: PersonUpdate) => {
   const result = await db
     .update(persons)
-    .set(_person)
-    .where(eq(persons.id, id));
+    .set({ ..._person, updatedAt: new Date() })
+    .where(eq(persons.id, id))
+    .returning();
 
-  console.log(result);
-  if (result.meta.changes === 0)
+  if (result.length === 0)
     throw newNotFoundError('update failed, person not found');
+
+  return result[0];
 };
 
 export default { getPersonByID, getPersons, addPerson, editPerson };

@@ -3,7 +3,11 @@ import {
   adminMiddleware,
   jwtMiddleware,
 } from '@/features/auth/auth.middleware';
-import { createPersonSchema, searchQueryShema } from './person.request.schema';
+import {
+  createPersonSchema,
+  searchQueryShema,
+  updatePersonSchema,
+} from './person.request.schema';
 import personService from './person.service';
 import type { ApiResponse } from '@/types/response.type';
 import {
@@ -13,7 +17,7 @@ import {
   queryValidator,
 } from '@/features/global/validator';
 import z from 'zod';
-import type { PersonInsert } from '@/db/schema/person';
+import type { PersonInsert, PersonUpdate } from '@/db/schema/person';
 
 const schema = searchQueryShema.extend(limitOffsetSchema.shape);
 
@@ -26,11 +30,14 @@ export const personRoute = new Hono()
     async (c) => {
       const { id } = c.req.valid('param');
       const data = await personService.getPersonByID(id);
-      return c.json<ApiResponse<typeof data>>({
-        success: true,
-        code: 200,
-        data,
-      });
+      return c.json<ApiResponse<typeof data>>(
+        {
+          success: true,
+          code: 200,
+          data,
+        },
+        200,
+      );
     },
   )
   // GET ALL + FILTER
@@ -41,12 +48,15 @@ export const personRoute = new Hono()
     const { data, total } = await personService.getPersons(query);
     // todo : nanti bikin util metaBuilder
 
-    return c.json<ApiResponse<typeof data>>({
-      success: true,
-      code: 200,
-      data,
-      meta: { total },
-    });
+    return c.json<ApiResponse<typeof data>>(
+      {
+        success: true,
+        code: 200,
+        data,
+        meta: { total },
+      },
+      200,
+    );
   })
   // ADD NEW PERSON
   .use(jwtMiddleware, adminMiddleware)
@@ -64,5 +74,27 @@ export const personRoute = new Hono()
       },
       201,
     );
-  });
-// .patch('/:id', );
+  })
+  // UPDATE PERSON
+  .put(
+    '/:id',
+    paramValidator(z.object({ id: z.coerce.number() })),
+    jsonValidator(updatePersonSchema),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const { birthDate, deathDate, ...req } = c.req.valid('json');
+      const person: PersonUpdate = req;
+      if (birthDate) person.birthDate = new Date(birthDate);
+      if (deathDate) person.deathDate = new Date(deathDate);
+
+      const data = await personService.editPerson(id, person);
+      return c.json<ApiResponse<typeof data>>(
+        {
+          success: true,
+          code: 200,
+          data,
+        },
+        200,
+      );
+    },
+  );

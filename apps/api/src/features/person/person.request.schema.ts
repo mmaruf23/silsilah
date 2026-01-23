@@ -10,7 +10,16 @@ export const createPersonSchema = z.object({
   fullname: z.string().min(3).optional(),
   address: z.string().min(3),
   gender: z.enum(['male', 'female']),
-  birthDate: z.string().datetime().optional(),
+  birthDate: z.iso.date().optional(),
+  deathDate: z.iso.date().optional(),
+});
+
+export const updatePersonSchema = z.object({
+  name: z.string().min(3).optional(),
+  fullname: z.string().min(3).optional(),
+  address: z.string().min(3).optional(),
+  gender: z.enum(['male', 'female']).optional(),
+  birthDate: z.iso.date().optional(),
   deathDate: z.iso.date().optional(),
 });
 

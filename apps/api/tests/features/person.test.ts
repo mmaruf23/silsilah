@@ -29,7 +29,7 @@ describe('person test', () => {
           fullname: 'test test test',
           address: 'jl test',
           gender: 'male',
-          birthDate: new Date(2001, 1, 8).toISOString(),
+          birthDate: '2001-02-08',
         },
       },
       {
@@ -40,7 +40,6 @@ describe('person test', () => {
     );
 
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(201);
     expect(jsonResponse.success).toBe(true);
     if (jsonResponse.success) {
@@ -57,7 +56,6 @@ describe('person test', () => {
 
     expect(res.status).toBe(200);
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(200);
     expect(jsonResponse.success).toBe(true);
     if (jsonResponse.success) {
@@ -82,7 +80,6 @@ describe('person test', () => {
 
     expect(res.status).toBe(200);
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(200);
     expect(jsonResponse.success).toBe(true);
     if (jsonResponse.success) {
@@ -106,7 +103,6 @@ describe('person test', () => {
 
     expect(res.status).toBe(404);
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(404);
     expect(jsonResponse.success).toBe(false);
   });
@@ -128,8 +124,32 @@ describe('person test', () => {
     // expired token
     expect(res.status).toBe(401);
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(401);
     expect(jsonResponse.success).toBe(false);
+  });
+
+  it('should success update person', async () => {
+    const res = await client.person[':id'].$put(
+      {
+        param: { id: '1' },
+        json: {
+          fullname: 'Yukinoshita Yukino',
+          birthDate: '1995-01-03',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${await generateToken(env.JWT_SECRET, true)}`,
+        },
+      },
+    );
+
+    const jsonResponse = await res.json();
+    expect(jsonResponse.code).toBe(200);
+    expect(jsonResponse.success).toBe(true);
+    if (jsonResponse.success) {
+      expect(jsonResponse.data).toBeDefined();
+      expect(jsonResponse.data?.fullname).toBe('Yukinoshita Yukino');
+    }
   });
 });
