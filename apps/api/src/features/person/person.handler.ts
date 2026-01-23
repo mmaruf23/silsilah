@@ -6,14 +6,14 @@ import {
 import { createPersonSchema, searchQueryShema } from './person.request.schema';
 import personService from './person.service';
 import type { ApiResponse } from '@/types/response.type';
-import { zValidator } from '@hono/zod-validator';
 import {
   jsonValidator,
   limitOffsetSchema,
   paramValidator,
   queryValidator,
-} from '../global/validator';
-import z from 'zod';
+} from '@/features/global/validator';
+import z, { date } from 'zod';
+import type { PersonInsert } from '@/db/schema/person';
 
 const schema = searchQueryShema.extend(limitOffsetSchema.shape);
 
@@ -24,14 +24,14 @@ export const personRoute = new Hono()
     loginValidator,
     paramValidator(z.object({ id: z.coerce.number() })),
     async (c) => {
-      const { id } = c.req.valid('param');
-      const data = await personService.getPersonByID(Number(id));
+      const { id } = c.req.valid('param') as { id: number };
+      const data = await personService.getPersonByID(id);
       return c.json<ApiResponse<typeof data>>({
         success: true,
         code: 200,
         data,
       });
-    }
+    },
   )
   // GET ALL + FILTER
   // todo :  bikin implement pagination -sama kaya users service-
@@ -48,19 +48,21 @@ export const personRoute = new Hono()
       meta: { total },
     });
   })
-  .post(
-    '/',
-    loginValidator,
-    adminValidator,
-    jsonValidator(createPersonSchema),
-    async (c) => {
-      const person = c.req.valid('json') as z.Infer<typeof createPersonSchema>;
-
-      const data = await personService.addPerson(person);
-      return c.json<ApiResponse>({
+  // ADD NEW PERSON
+  .post('/', loginValidator, jsonValidator(createPersonSchema), async (c) => {
+    const { birthDate, deathDate, ...req } = c.req.valid('json');
+    const person: PersonInsert = {
+      ...req,
+      birthDate: birthDate ? new Date(birthDate) : undefined,
+      deathDate: deathDate ? new Date(deathDate) : undefined,
+    };
+    const data = await personService.addPerson(person);
+    return c.json<ApiResponse<typeof data>>(
+      {
         success: true,
-        code: 200,
+        code: 201,
         data,
-      });
-    }
-  );
+      },
+      201,
+    );
+  });

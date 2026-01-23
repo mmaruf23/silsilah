@@ -10,8 +10,8 @@ export const createPersonSchema = z.object({
   fullname: z.string().min(3).optional(),
   address: z.string().min(3),
   gender: z.enum(['male', 'female']),
-  birthDate: z.date().optional(),
-  deathDate: z.date().optional(),
+  birthDate: z.string().datetime().optional(),
+  deathDate: z.iso.date().optional(),
 });
 
 // todo : test input person pake birthdate / deathdate, pengen tahu gimana cara kasih inputnya lewat request body

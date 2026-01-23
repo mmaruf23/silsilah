@@ -1,5 +1,5 @@
 @url = http://localhost:8787
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaWZhc2VsbGEiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2NzYzMzI5N30.7PAre4JoNKgC4vAgIFEIWGrKHhDMY-nYx_RjfOHwKE8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaWZhc2VsbGEiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2OTE2NDkzN30.wxnvEsDE3ikADuJKj7fHJ5iDYgEJg48g_Mbrat_jHrw
 @tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc2NzYyOTYxNH0.-obv_Lsnsd7ckFKNYAlSYH0bIN7z8WNaGUb5Dr3CuYg
 
 ### REGISTER
@@ -34,3 +34,16 @@ Authorization: Bearer {{token}}
 
 ### GET ALL PERSON + FILTER
 GET {{url}}/person?name=yuki
+
+### ADD NEW PERSON 
+POST {{url}}/person
+Authorization: BEARER {{token}}
+Content-Type: application/json
+
+{
+  "name": "haruno",
+  "fullname": "Yukinoshita Haruno",
+  "address": "chiba",
+  "gender": "female",
+  "birthDate": "1992-07-06T17:00:00.000Z"
+}

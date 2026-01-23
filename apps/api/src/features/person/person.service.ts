@@ -29,7 +29,7 @@ const getPersons = async (query: PersonFilter) => {
     where: ({ name, address }, { and, like, eq }) =>
       and(
         query.name ? like(name, `%${query.name}%`) : undefined,
-        query.address ? eq(address, query.address) : undefined
+        query.address ? eq(address, query.address) : undefined,
       ),
     limit: query.limit,
     offset: query.offset,
@@ -50,7 +50,7 @@ const addPerson = async (_person: PersonInsert) => {
       throw newInputPersonError();
     });
 
-  if (result.meta.last_row_id) throw newPersonAlreadyExists();
+  if (!result.meta.last_row_id) throw newPersonAlreadyExists();
 
   return { id: result.meta.last_row_id };
 };

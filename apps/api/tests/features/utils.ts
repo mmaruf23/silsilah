@@ -1,3 +1,5 @@
+import { sign } from 'hono/jwt';
+
 export const queryCreatePersonTable = `CREATE TABLE persons (
 	id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	name text NOT NULL,
@@ -22,3 +24,13 @@ export const queryCreateUserTable = `CREATE TABLE users (
 );`;
 
 export const querySeedUserTable = `INSERT INTO users (username, role, created_at) VALUES ('admin', 'admin', 1767445982),('rifasella','user',1767445982);`;
+
+export const generateToken = () =>
+  sign(
+    {
+      sub: 'admin',
+      role: 'admin',
+      exp: Math.floor(Date.now() / 1000) + 3600, // 1 jam
+    },
+    'iniprivatekey',
+  );
