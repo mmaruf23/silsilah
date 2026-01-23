@@ -7,7 +7,7 @@
   //   "nodejs_compat"
   // ],
   "vars": {
-    "MY_VAR": "my-variable"
+    "JWT_SECRET": "iniprivatekey",
   },
   // "kv_namespaces": [
   //   {
@@ -25,9 +25,9 @@
     {
       "binding": "DB",
       "database_name": "my-database",
-      "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    }
-  ]
+      "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    },
+  ],
   // "ai": {
   //   "binding": "AI"
   // },

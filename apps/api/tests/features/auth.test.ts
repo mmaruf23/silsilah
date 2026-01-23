@@ -17,6 +17,24 @@ describe('login test', () => {
 
   const client = testClient(app, env);
 
+  it('should success register', async () => {
+    const res = await client.auth.register.$post({
+      json: {
+        username: 'testusername',
+        password: 'testpassword',
+      },
+    });
+
+    expect(res.status).toBe(200);
+    const resJson = await res.json();
+    expect(resJson.code).toBe(200);
+    expect(resJson.success).toBeTruthy();
+    if (resJson.success) {
+      expect(resJson.data).toBeDefined();
+      expect(resJson.data?.id).toBeDefined();
+    }
+  });
+
   it('should login success', async () => {
     const res = await client.auth.login.$post({
       json: {
@@ -27,9 +45,11 @@ describe('login test', () => {
 
     expect(res.status).toBe(200);
     const resJson = await res.json();
-    expect(resJson.success).toBe(true);
     expect(resJson.code).toBe(200);
-    expect(resJson.data).toBeDefined();
-    expect(resJson.data?.token).toBeDefined();
+    expect(resJson.success).toBe(true);
+    if (resJson.success) {
+      expect(resJson.data).toBeDefined();
+      expect(resJson.data?.token).toBeDefined();
+    }
   });
 });

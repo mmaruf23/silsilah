@@ -4,6 +4,7 @@ import {
   generateToken,
   queryCreatePersonTable,
   queryCreateUserTable,
+  querySeedPersonTable,
   querySeedUserTable,
 } from './utils';
 import { testClient } from 'hono/testing';
@@ -14,13 +15,13 @@ describe('person test', () => {
     await env.DB.prepare(queryCreatePersonTable).run();
     await env.DB.prepare(queryCreateUserTable).run();
     await env.DB.prepare(querySeedUserTable).run();
+    await env.DB.prepare(querySeedPersonTable).run();
   });
 
   const client = testClient(app, env);
 
   it('should success add new person', async () => {
-    const token = await generateToken();
-
+    const token = await generateToken(env.JWT_SECRET, true);
     const res = await client.person.$post(
       {
         json: {
@@ -45,5 +46,90 @@ describe('person test', () => {
     if (jsonResponse.success) {
       expect(jsonResponse.data?.id).toBeDefined();
     }
+  });
+
+  it('should success get all person', async () => {
+    const res = await client.person.$get({
+      query: {
+        limit: 3,
+      },
+    });
+
+    expect(res.status).toBe(200);
+    const jsonResponse = await res.json();
+    console.log(jsonResponse);
+    expect(jsonResponse.code).toBe(200);
+    expect(jsonResponse.success).toBe(true);
+    if (jsonResponse.success) {
+      expect(jsonResponse.data).toBeDefined();
+      expect(jsonResponse.data?.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('should success get person by id', async () => {
+    const res = await client.person[':id'].$get(
+      {
+        param: {
+          id: '1',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${await generateToken(env.JWT_SECRET)}`,
+        },
+      },
+    );
+
+    expect(res.status).toBe(200);
+    const jsonResponse = await res.json();
+    console.log(jsonResponse);
+    expect(jsonResponse.code).toBe(200);
+    expect(jsonResponse.success).toBe(true);
+    if (jsonResponse.success) {
+      expect(jsonResponse.data).toBeDefined();
+    }
+  });
+
+  it('should not found get person by id', async () => {
+    const res = await client.person[':id'].$get(
+      {
+        param: {
+          id: '9999',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${await generateToken(env.JWT_SECRET)}`,
+        },
+      },
+    );
+
+    expect(res.status).toBe(404);
+    const jsonResponse = await res.json();
+    console.log(jsonResponse);
+    expect(jsonResponse.code).toBe(404);
+    expect(jsonResponse.success).toBe(false);
+  });
+
+  it('should unauthorize get person by id', async () => {
+    const res = await client.person[':id'].$get(
+      {
+        param: {
+          id: '1',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyaWZhc2VsbGEiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2OTE2NDkzN30.wxnvEsDE3ikADuJKj7fHJ5iDYgEJg48g_Mbrat_jHrw`,
+        },
+      },
+    );
+
+    // expired token
+    expect(res.status).toBe(401);
+    const jsonResponse = await res.json();
+    console.log(jsonResponse);
+    expect(jsonResponse.code).toBe(401);
+    expect(jsonResponse.success).toBe(false);
   });
 });

@@ -1,18 +1,18 @@
 import { Hono } from 'hono';
 import {
-  adminValidator,
-  loginValidator,
+  adminMiddleware,
+  jwtMiddleware,
 } from '@/features/auth/auth.middleware';
 import { createPersonSchema, searchQueryShema } from './person.request.schema';
 import personService from './person.service';
 import type { ApiResponse } from '@/types/response.type';
 import {
-  jsonValidator,
   limitOffsetSchema,
+  jsonValidator,
   paramValidator,
   queryValidator,
 } from '@/features/global/validator';
-import z, { date } from 'zod';
+import z from 'zod';
 import type { PersonInsert } from '@/db/schema/person';
 
 const schema = searchQueryShema.extend(limitOffsetSchema.shape);
@@ -21,10 +21,10 @@ export const personRoute = new Hono()
   // GET BY ID
   .get(
     '/:id',
-    loginValidator,
+    jwtMiddleware,
     paramValidator(z.object({ id: z.coerce.number() })),
     async (c) => {
-      const { id } = c.req.valid('param') as { id: number };
+      const { id } = c.req.valid('param');
       const data = await personService.getPersonByID(id);
       return c.json<ApiResponse<typeof data>>({
         success: true,
@@ -36,7 +36,7 @@ export const personRoute = new Hono()
   // GET ALL + FILTER
   // todo :  bikin implement pagination -sama kaya users service-
   .get('/', queryValidator(schema), async (c) => {
-    const query = c.req.valid('query') as z.Infer<typeof schema>;
+    const query = c.req.valid('query');
 
     const { data, total } = await personService.getPersons(query);
     // todo : nanti bikin util metaBuilder
@@ -49,13 +49,12 @@ export const personRoute = new Hono()
     });
   })
   // ADD NEW PERSON
-  .post('/', loginValidator, jsonValidator(createPersonSchema), async (c) => {
+  .use(jwtMiddleware, adminMiddleware)
+  .post('/', jsonValidator(createPersonSchema), async (c) => {
     const { birthDate, deathDate, ...req } = c.req.valid('json');
-    const person: PersonInsert = {
-      ...req,
-      birthDate: birthDate ? new Date(birthDate) : undefined,
-      deathDate: deathDate ? new Date(deathDate) : undefined,
-    };
+    const person: PersonInsert = req;
+    if (birthDate) person.birthDate = new Date(birthDate);
+    if (deathDate) person.deathDate = new Date(deathDate);
     const data = await personService.addPerson(person);
     return c.json<ApiResponse<typeof data>>(
       {
@@ -66,3 +65,4 @@ export const personRoute = new Hono()
       201,
     );
   });
+// .patch('/:id', );

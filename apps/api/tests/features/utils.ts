@@ -25,12 +25,19 @@ export const queryCreateUserTable = `CREATE TABLE users (
 
 export const querySeedUserTable = `INSERT INTO users (username, role, created_at) VALUES ('admin', 'admin', 1767445982),('rifasella','user',1767445982);`;
 
-export const generateToken = () =>
+export const querySeedPersonTable = `INSERT INTO persons (name, address, gender, created_at) VALUES ("yukino", "chiba", "female", 1767445982), ("yui", "chiba", "female", 1767445982), ("yumiko", "chiba", "female", 1767445982), ("komachi", "chiba", "female", 1767445982 )`;
+/**
+ *
+ * @param JWT_SECRET
+ * @param admin default false
+ * @returns promised string token
+ */
+export const generateToken = (JWT_SECRET: string, admin: boolean = false) =>
   sign(
     {
-      sub: 'admin',
-      role: 'admin',
+      sub: 'generated',
+      role: admin ? 'admin' : 'user',
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 jam
     },
-    'iniprivatekey',
+    JWT_SECRET,
   );

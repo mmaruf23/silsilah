@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import {
-  adminValidator,
-  loginValidator,
+  adminMiddleware,
+  jwtMiddleware,
 } from '@/features/auth/auth.middleware';
 import type { ApiResponse } from '@/types/response.type';
 import userService from './user.service';
@@ -9,7 +9,7 @@ import { zValidator } from '@hono/zod-validator';
 import { limitOffsetSchema } from '../global/validator';
 
 export const userRoutes = new Hono()
-  .get('/me', loginValidator, async (c) => {
+  .get('/me', jwtMiddleware, async (c) => {
     const { sub } = c.get('jwtPayload') as { sub: string };
 
     const data = await userService.getUserProfile(sub);
@@ -28,8 +28,8 @@ export const userRoutes = new Hono()
 
   .get(
     '/',
-    loginValidator,
-    adminValidator,
+    jwtMiddleware,
+    adminMiddleware,
     zValidator('query', limitOffsetSchema),
     async (c) => {
       const { limit, offset } = c.req.valid('query');
@@ -39,5 +39,5 @@ export const userRoutes = new Hono()
         code: 200,
         data,
       });
-    }
+    },
   );

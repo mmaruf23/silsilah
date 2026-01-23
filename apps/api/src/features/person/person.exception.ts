@@ -11,3 +11,9 @@ export const newInputPersonError = () => {
     message: 'gagal input new person',
   });
 };
+
+// export const newUpdatePersonError = () => {
+//   return new HTTPException(400, {
+//     message: 'gagal update person',
+//   });
+// };

@@ -1,5 +1,9 @@
 import { db } from '@/db';
-import { persons, type PersonInsert } from '@/db/schema/person';
+import {
+  persons,
+  type PersonInsert,
+  type PersonUpdate,
+} from '@/db/schema/person';
 import { and, count, eq, like } from 'drizzle-orm';
 import { newNotFoundError } from '../global/global.exception';
 import { users } from '@/db/schema/user';
@@ -55,4 +59,15 @@ const addPerson = async (_person: PersonInsert) => {
   return { id: result.meta.last_row_id };
 };
 
-export default { getPersonByID, getPersons, addPerson };
+const editPerson = async (id: number, _person: PersonUpdate) => {
+  const result = await db
+    .update(persons)
+    .set(_person)
+    .where(eq(persons.id, id));
+
+  console.log(result);
+  if (result.meta.changes === 0)
+    throw newNotFoundError('update failed, person not found');
+};
+
+export default { getPersonByID, getPersons, addPerson, editPerson };

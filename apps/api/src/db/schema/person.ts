@@ -24,7 +24,7 @@ export const persons = sqliteTable(
   },
   (t) => [
     unique('name_address_unique_constraint').on(t.name, t.fullname, t.address),
-  ]
+  ],
 );
 
 export const personRelations = relations(persons, ({ many, one }) => ({
@@ -35,3 +35,6 @@ export const personRelations = relations(persons, ({ many, one }) => ({
 
 export type Person = InferSelectModel<typeof persons>;
 export type PersonInsert = InferInsertModel<typeof persons>;
+export type PersonUpdate = Partial<
+  Omit<PersonInsert, 'id' | 'createdAt' | 'updatedAt'>
+>;
