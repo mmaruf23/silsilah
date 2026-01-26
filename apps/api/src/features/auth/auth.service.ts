@@ -8,6 +8,7 @@ import {
 import { eq } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
+import { env } from 'cloudflare:workers';
 
 const register = async (userInput: UserInsert) => {
   if (userInput.password)
@@ -49,7 +50,7 @@ const login = async ({
       role: user.role,
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 jam
     },
-    'iniprivatekey'
+    env.JWT_SECRET,
   );
 
   return { token };

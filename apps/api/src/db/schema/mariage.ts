@@ -1,6 +1,10 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { persons } from './person';
-import { relations } from 'drizzle-orm';
+import {
+  relations,
+  type InferInsertModel,
+  type InferSelectModel,
+} from 'drizzle-orm';
 import { descendants } from './descendant';
 
 export const mariages = sqliteTable('mariage', {
@@ -32,3 +36,10 @@ export const mariageRelations = relations(mariages, ({ many, one }) => ({
   }),
   children: many(descendants),
 }));
+
+export type Mariage = InferSelectModel<typeof mariages>;
+export type MariageInsert = Omit<
+  InferInsertModel<typeof mariages>,
+  'id' | 'created_at' | 'updated_at'
+>;
+export type MariageUpdate = Partial<MariageInsert>; // buang-buang tenanga wkwk

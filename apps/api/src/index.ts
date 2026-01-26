@@ -4,6 +4,8 @@ import { userRoutes } from './features/user/user.handler';
 import { errorHandler, notFoundHandler } from './features/global/error.handler';
 import { personRoute } from './features/person/person.handler';
 import { cors } from 'hono/cors';
+import { mariageRoute } from './features/mariage/mariage.handler';
+import { descendantRoute } from './features/descendant/descendant.handler';
 
 const app = new Hono()
   .use(
@@ -11,7 +13,7 @@ const app = new Hono()
     cors({
       origin: 'http://localhost:5173',
       credentials: true,
-    })
+    }),
   )
   .get('/', (c) => {
     return c.text('Hello');
@@ -19,6 +21,8 @@ const app = new Hono()
   .route('/auth', authRoutes)
   .route('/user', userRoutes)
   .route('/person', personRoute)
+  .route('/mariage', mariageRoute)
+  .route('/descendant', descendantRoute)
   .onError(errorHandler)
   .notFound(notFoundHandler);
 

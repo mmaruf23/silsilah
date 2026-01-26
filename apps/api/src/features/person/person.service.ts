@@ -5,7 +5,7 @@ import {
   type PersonUpdate,
 } from '@/db/schema/person';
 import { and, count, eq, like } from 'drizzle-orm';
-import { newNotFoundError } from '../global/global.exception';
+import { newNotFoundError } from '../global/exception';
 import { users } from '@/db/schema/user';
 import {
   newInputPersonError,
@@ -17,6 +17,15 @@ type PersonFilter = {
   offset?: number;
   name?: string;
   address?: string;
+};
+
+const assertExist = async (id: number) => {
+  const exist = await db.query.persons.findFirst({
+    where: eq(persons.id, id),
+    columns: { id: true },
+  });
+
+  if (!exist) throw newNotFoundError('person not found');
 };
 
 const getPersonByID = async (id: number) => {
@@ -72,4 +81,10 @@ const editPerson = async (id: number, _person: PersonUpdate) => {
   return result[0];
 };
 
-export default { getPersonByID, getPersons, addPerson, editPerson };
+export default {
+  getPersonByID,
+  getPersons,
+  addPerson,
+  editPerson,
+  assertExist,
+};

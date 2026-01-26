@@ -5,7 +5,7 @@ import { relations } from 'drizzle-orm';
 
 export const descendants = sqliteTable('descendant', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id')
+  personId: integer('person_id')
     .notNull()
     .references(() => persons.id, { onDelete: 'cascade' }),
   mariageId: integer('mariage_id')
@@ -19,7 +19,7 @@ export const descendants = sqliteTable('descendant', {
 
 export const descendantRelations = relations(descendants, ({ one }) => ({
   user: one(persons, {
-    fields: [descendants.userId],
+    fields: [descendants.personId],
     references: [persons.id],
   }),
   mariages: one(mariages, {

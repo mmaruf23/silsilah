@@ -5,7 +5,7 @@ export const searchQueryShema = z.object({
   address: z.string().min(3).optional(),
 });
 
-export const createPersonSchema = z.object({
+export const newPersonSchema = z.object({
   name: z.string().min(3),
   fullname: z.string().min(3).optional(),
   address: z.string().min(3),
@@ -22,3 +22,5 @@ export const updatePersonSchema = z.object({
   birthDate: z.iso.date().optional(),
   deathDate: z.iso.date().optional(),
 });
+
+// next : bikin dry

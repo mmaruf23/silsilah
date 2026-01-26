@@ -34,7 +34,8 @@ export const personRelations = relations(persons, ({ many, one }) => ({
 }));
 
 export type Person = InferSelectModel<typeof persons>;
-export type PersonInsert = InferInsertModel<typeof persons>;
-export type PersonUpdate = Partial<
-  Omit<PersonInsert, 'id' | 'createdAt' | 'updatedAt'>
+export type PersonInsert = Omit<
+  InferInsertModel<typeof persons>,
+  'id' | 'createdAt' | 'updatedAt'
 >;
+export type PersonUpdate = Partial<PersonInsert>;

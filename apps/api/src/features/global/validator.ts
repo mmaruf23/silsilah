@@ -54,3 +54,7 @@ export const jsonValidator = <T extends z.ZodRawShape>(
 
     return parsed.data;
   });
+
+export const IDParamValidator = paramValidator(
+  z.object({ id: z.coerce.number() }),
+);

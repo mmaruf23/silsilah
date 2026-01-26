@@ -4,10 +4,10 @@ import {
   jwtMiddleware,
 } from '@/features/auth/auth.middleware';
 import {
-  createPersonSchema,
+  newPersonSchema,
   searchQueryShema,
   updatePersonSchema,
-} from './person.request.schema';
+} from './person.middleware';
 import personService from './person.service';
 import type { ApiResponse } from '@/types/response.type';
 import {
@@ -18,8 +18,6 @@ import {
 } from '@/features/global/validator';
 import z from 'zod';
 import type { PersonInsert, PersonUpdate } from '@/db/schema/person';
-
-const schema = searchQueryShema.extend(limitOffsetSchema.shape);
 
 export const personRoute = new Hono()
   // GET BY ID
@@ -42,25 +40,29 @@ export const personRoute = new Hono()
   )
   // GET ALL + FILTER
   // todo :  bikin implement pagination -sama kaya users service-
-  .get('/', queryValidator(schema), async (c) => {
-    const query = c.req.valid('query');
+  .get(
+    '/',
+    queryValidator(searchQueryShema.extend(limitOffsetSchema.shape)),
+    async (c) => {
+      const query = c.req.valid('query');
 
-    const { data, total } = await personService.getPersons(query);
-    // todo : nanti bikin util metaBuilder
+      const { data, total } = await personService.getPersons(query);
+      // todo : nanti bikin util metaBuilder
 
-    return c.json<ApiResponse<typeof data>>(
-      {
-        success: true,
-        code: 200,
-        data,
-        meta: { total },
-      },
-      200,
-    );
-  })
+      return c.json<ApiResponse<typeof data>>(
+        {
+          success: true,
+          code: 200,
+          data,
+          meta: { total },
+        },
+        200,
+      );
+    },
+  )
   // ADD NEW PERSON
   .use(jwtMiddleware, adminMiddleware)
-  .post('/', jsonValidator(createPersonSchema), async (c) => {
+  .post('/', jsonValidator(newPersonSchema), async (c) => {
     const { birthDate, deathDate, ...req } = c.req.valid('json');
     const person: PersonInsert = req;
     if (birthDate) person.birthDate = new Date(birthDate);
@@ -98,3 +100,5 @@ export const personRoute = new Hono()
       );
     },
   );
+// todo : delete person feature.
+// next : update person juga bisa oleh yang punya akun, gak harus admin doang. : mungkin bisa tambah validator baru buat ganti admin validator di bagian route nya
