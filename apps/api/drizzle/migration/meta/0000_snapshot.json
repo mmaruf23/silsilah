@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7c1467c3-ea8b-4b0f-a634-b602015c14ff",
+  "id": "c58b4ae5-da2f-444b-b3ee-932ea25b8849",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "descendant": {
@@ -14,8 +14,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "user_id": {
-          "name": "user_id",
+        "person_id": {
+          "name": "person_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -45,12 +45,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "descendant_user_id_persons_id_fk": {
-          "name": "descendant_user_id_persons_id_fk",
+        "descendant_person_id_persons_id_fk": {
+          "name": "descendant_person_id_persons_id_fk",
           "tableFrom": "descendant",
           "tableTo": "persons",
           "columnsFrom": [
-            "user_id"
+            "person_id"
           ],
           "columnsTo": [
             "id"
@@ -129,7 +129,16 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "husband_wife_unique_constraint": {
+          "name": "husband_wife_unique_constraint",
+          "columns": [
+            "husband_id",
+            "wife_id"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "mariage_husband_id_persons_id_fk": {
           "name": "mariage_husband_id_persons_id_fk",
@@ -229,7 +238,17 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "name_address_unique_constraint": {
+          "name": "name_address_unique_constraint",
+          "columns": [
+            "name",
+            "fullname",
+            "address"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -289,7 +308,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "columns": [
+            "username"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "users_person_id_persons_id_fk": {
           "name": "users_person_id_persons_id_fk",

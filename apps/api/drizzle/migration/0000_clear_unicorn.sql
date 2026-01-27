@@ -1,10 +1,10 @@
 CREATE TABLE `descendant` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`user_id` integer NOT NULL,
+	`person_id` integer NOT NULL,
 	`mariage_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer,
-	FOREIGN KEY (`user_id`) REFERENCES `persons`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`person_id`) REFERENCES `persons`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`mariage_id`) REFERENCES `mariage`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -20,6 +20,7 @@ CREATE TABLE `mariage` (
 	FOREIGN KEY (`wife_id`) REFERENCES `persons`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `husband_wife_unique_constraint` ON `mariage` (`husband_id`,`wife_id`);--> statement-breakpoint
 CREATE TABLE `persons` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -32,6 +33,7 @@ CREATE TABLE `persons` (
 	`updated_at` integer
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `name_address_unique_constraint` ON `persons` (`name`,`fullname`,`address`);--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`username` text NOT NULL,
@@ -42,3 +44,5 @@ CREATE TABLE `users` (
 	`updated_at` integer,
 	FOREIGN KEY (`person_id`) REFERENCES `persons`(`id`) ON UPDATE no action ON DELETE set null
 );
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);

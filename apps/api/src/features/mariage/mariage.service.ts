@@ -14,13 +14,15 @@ const addMariage = async (newMariage: MariageInsert) => {
     .values(newMariage)
     .onConflictDoNothing()
     .returning({
+      id: mariages.id,
       husband_id: mariages.husband_id,
       wife_id: mariages.wife_id,
       start_date: mariages.start_date,
       end_date: mariages.end_date,
     });
 
-  if (!mariage) throw newInputMariageError();
+  if (!mariage)
+    throw newInputMariageError('fail input mariage data or already exists');
 
   return mariage;
 };

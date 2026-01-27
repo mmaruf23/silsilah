@@ -25,7 +25,7 @@ const assertExist = async (id: number) => {
     columns: { id: true },
   });
 
-  if (!exist) throw newNotFoundError('person not found');
+  if (!exist) throw newNotFoundError(`person with id ${id} not found`);
 };
 
 const getPersonByID = async (id: number) => {

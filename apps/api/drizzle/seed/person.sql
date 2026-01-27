@@ -6,6 +6,12 @@ INSERT INTO
         created_at
     )
 VALUES (
+        "hachiman",
+        "chiba",
+        "male",
+        1767445982
+    ),
+    (
         "yukino",
         "chiba",
         "female",

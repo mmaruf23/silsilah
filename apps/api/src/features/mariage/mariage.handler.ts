@@ -6,14 +6,17 @@ import {
 } from './mariage.middleware';
 import mariageService from './mariage.service';
 import { adminMiddleware, jwtMiddleware } from '../auth/auth.middleware';
-import { X } from 'vitest/dist/chunks/reporters.d.BFLkQcL6.js';
 import { IDParamValidator } from '../global/validator';
+import personService from '../person/person.service';
 
 export const mariageRoute = new Hono()
   .use(jwtMiddleware, adminMiddleware)
   // NEW MARIAGE
   .post('/', newMariageValidator, async (c) => {
     const mariage = c.req.valid('json');
+    // todo : validasi gender disini
+    if (mariage.husband_id) await personService.assertExist(mariage.husband_id);
+    if (mariage.wife_id) await personService.assertExist(mariage.wife_id);
     const data = await mariageService.addMariage(mariage);
     return c.json<ApiResponse<typeof data>>(
       {

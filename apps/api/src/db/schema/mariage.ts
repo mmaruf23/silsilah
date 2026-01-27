@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 import { persons } from './person';
 import {
   relations,
@@ -7,21 +7,25 @@ import {
 } from 'drizzle-orm';
 import { descendants } from './descendant';
 
-export const mariages = sqliteTable('mariage', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  husband_id: integer('husband_id').references(() => persons.id, {
-    onDelete: 'set null',
-  }),
-  wife_id: integer('wife_id').references(() => persons.id, {
-    onDelete: 'set null',
-  }),
-  start_date: text('start_date'),
-  end_date: text('end_date'),
-  created_at: integer('created_at', { mode: 'timestamp' })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  updated_at: integer('updated_at', { mode: 'timestamp' }),
-});
+export const mariages = sqliteTable(
+  'mariage',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    husband_id: integer('husband_id').references(() => persons.id, {
+      onDelete: 'set null',
+    }),
+    wife_id: integer('wife_id').references(() => persons.id, {
+      onDelete: 'set null',
+    }),
+    start_date: text('start_date'),
+    end_date: text('end_date'),
+    created_at: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+    updated_at: integer('updated_at', { mode: 'timestamp' }),
+  },
+  (t) => [unique('husband_wife_unique_constraint').on(t.husband_id, t.wife_id)],
+);
 
 export const mariageRelations = relations(mariages, ({ many, one }) => ({
   husband: one(persons, {
