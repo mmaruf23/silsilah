@@ -50,4 +50,156 @@ CREATE TABLE \`users\` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX \`users_username_unique\` ON \`users\` (\`username\`);
 `,
+  "0001_seed_person_table.sql": `
+-- Migration number: 0001 	 2026-02-01T17:15:01.641Z
+INSERT INTO
+    persons (
+        name,
+        address,
+        gender,
+        created_at
+    )
+VALUES (
+        "mastaka",
+        "pasirmakam",
+        "male",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "sapiah",
+        "pasirmakam",
+        "female",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "saprudin",
+        "kukulu",
+        "male",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "safaat",
+        "leweungkadu",
+        "male",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "mulyanah",
+        "pasirmakam",
+        "female",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "surmanah",
+        "pasirmakam",
+        "female",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        "salikun",
+        "pasirmakam",
+        "male",
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    );
+`,
+  "0002_seed_user_table.sql": `
+-- Migration number: 0002 	 2026-02-01T17:15:17.806Z
+INSERT INTO
+    users (
+        username,
+        password,
+        role,
+        created_at
+    )
+VALUES (
+        'iniadmin',
+        NULL,
+        'admin',
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        'rifasella',
+        NULL,
+        'admin',
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    );
+`,
+  "0003_seed_mariage_table.sql": `
+-- Migration number: 0003 	 2026-02-01T17:15:24.452Z
+INSERT INTO
+    mariage (
+        husband_id,
+        wife_id,
+        created_at
+    )
+VALUES (
+        1,
+        2,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    );
+`,
+  "0004_seed_descendant_table.sql": `
+-- Migration number: 0004 	 2026-02-01T17:15:34.066Z
+INSERT INTO
+    descendant (
+        person_id,
+        mariage_id,
+        created_at
+    )
+VALUES (
+        3,
+        1,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        4,
+        1,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        5,
+        1,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        6,
+        1,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    ),
+    (
+        7,
+        1,
+        CAST(
+            strftime('%s', 'now') AS INTEGER
+        )
+    );
+`,
 } as const;
