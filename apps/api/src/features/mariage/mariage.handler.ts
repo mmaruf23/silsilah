@@ -14,9 +14,11 @@ export const mariageRoute = new Hono()
   // NEW MARIAGE
   .post('/', newMariageValidator, async (c) => {
     const mariage = c.req.valid('json');
-    // todo : validasi gender disini
-    if (mariage.husband_id) await personService.assertExist(mariage.husband_id);
-    if (mariage.wife_id) await personService.assertExist(mariage.wife_id);
+    if (mariage.husband_id)
+      await personService.assertExist(mariage.husband_id, 'male');
+    if (mariage.wife_id)
+      await personService.assertExist(mariage.wife_id, 'female');
+
     const data = await mariageService.addMariage(mariage);
     return c.json<ApiResponse<typeof data>>(
       {

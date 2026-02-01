@@ -18,6 +18,7 @@ import {
 } from '@/features/global/validator';
 import z from 'zod';
 import type { PersonInsert, PersonUpdate } from '@/db/schema/person';
+import descendantService from '../descendant/descendant.service';
 
 export const personRoute = new Hono()
   // GET BY ID
@@ -98,6 +99,20 @@ export const personRoute = new Hono()
         },
         200,
       );
+    },
+  )
+  // GET PARENTS
+  .get(
+    '/:id/parents',
+    paramValidator(z.object({ id: z.coerce.number() })),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const data = descendantService.getParents(id);
+      return c.json<ApiResponse<typeof data>>({
+        success: true,
+        code: 200,
+        data,
+      });
     },
   );
 // todo : delete person feature.

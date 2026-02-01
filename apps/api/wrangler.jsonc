@@ -26,6 +26,7 @@
       "binding": "DB",
       "database_name": "my-database",
       "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "migrations_dir": "drizzle/migration",
     },
   ],
   // "ai": {

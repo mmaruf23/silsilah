@@ -12,6 +12,12 @@ export const newInputPersonError = () => {
   });
 };
 
+export const newInvalidRole = (m?: string) => {
+  return new HTTPException(400, {
+    message: m ?? 'Invalid role for the person',
+  });
+};
+
 // export const newUpdatePersonError = () => {
 //   return new HTTPException(400, {
 //     message: 'gagal update person',

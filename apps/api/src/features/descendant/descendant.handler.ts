@@ -7,9 +7,9 @@ import mariageService from '../mariage/mariage.service';
 import descendantService from './descendant.service';
 
 export const descendantRoute = new Hono()
-  .use(jwtMiddleware, adminMiddleware)
+  .use(jwtMiddleware)
   // ADD DESCENDANT
-  .post('/', newDescendantValidator, async (c) => {
+  .post('/', adminMiddleware, newDescendantValidator, async (c) => {
     const { personId, mariageId } = c.req.valid('json');
     await Promise.all([
       personService.assertExist(personId),

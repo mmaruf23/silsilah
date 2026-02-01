@@ -9,6 +9,7 @@ import { newNotFoundError } from '../global/exception';
 import { users } from '@/db/schema/user';
 import {
   newInputPersonError,
+  newInvalidRole,
   newPersonAlreadyExists,
 } from './person.exception';
 
@@ -19,13 +20,14 @@ type PersonFilter = {
   address?: string;
 };
 
-const assertExist = async (id: number) => {
+const assertExist = async (id: number, as?: 'male' | 'female') => {
   const exist = await db.query.persons.findFirst({
     where: eq(persons.id, id),
-    columns: { id: true },
+    columns: { id: true, gender: true },
   });
 
   if (!exist) throw newNotFoundError(`person with id ${id} not found`);
+  if (as && as !== exist.gender) throw newInvalidRole();
 };
 
 const getPersonByID = async (id: number) => {
