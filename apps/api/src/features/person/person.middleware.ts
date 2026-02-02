@@ -1,9 +1,12 @@
 import z from 'zod';
+import { limitOffsetSchema } from '../global/validator';
 
-export const searchQueryShema = z.object({
-  name: z.string().min(3).optional(),
-  address: z.string().min(3).optional(),
-});
+export const searchPersonShema = z
+  .object({
+    name: z.string().min(3).optional(),
+    address: z.string().min(3).optional(),
+  })
+  .extend(limitOffsetSchema.shape);
 
 export const newPersonSchema = z.object({
   name: z.string().min(3),
@@ -24,3 +27,5 @@ export const updatePersonSchema = z.object({
 });
 
 // next : bikin dry
+
+export type PersonFilter = z.infer<typeof searchPersonShema>;

@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { descendants } from '@/db/schema/descendant';
 import { newDescendantInsertError } from './descendant.exception';
 import { persons } from '@/db/schema/person';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { newNotFoundError } from '../global/exception';
 
 const addDescendant = async (personId: number, mariageId: number) => {
@@ -28,12 +28,8 @@ const getParents = async (personId: number) => {
           mariages: {
             columns: {},
             with: {
-              husband: {
-                columns: { createdAt: false, updatedAt: false },
-              },
-              wife: {
-                columns: { createdAt: false, updatedAt: false },
-              },
+              husband: { columns: { createdAt: false, updatedAt: false } },
+              wife: { columns: { createdAt: false, updatedAt: false } },
             },
           },
         },
@@ -50,4 +46,31 @@ const getParents = async (personId: number) => {
   };
 };
 
-export default { addDescendant, getParents };
+const getChildrens = async (personId: number) => {
+  const person = await db.query.persons.findFirst({
+    columns: { id: true, gender: true },
+    where: ({ id }, { eq }) => eq(id, personId),
+  });
+
+  if (!person) throw newNotFoundError(`person with id ${personId} not found`);
+  const _mariages = await db.query.mariages.findMany({
+    columns: { id: true, husband_id: true, wife_id: true },
+    where: ({ husband_id, wife_id }, { or, eq }) =>
+      or(eq(husband_id, personId), eq(wife_id, personId)),
+    with: {
+      children: {
+        columns: {},
+        with: { person: { columns: { createdAt: false, updatedAt: false } } },
+      },
+      husband: { columns: { createdAt: false, updatedAt: false } },
+      wife: { columns: { createdAt: false, updatedAt: false } },
+    },
+  });
+
+  return _mariages.map((m) => ({
+    partner: person.gender === 'male' ? m.wife : m.husband,
+    children: m.children.map((c) => c.person),
+  }));
+};
+
+export default { addDescendant, getParents, getChildrens };

@@ -4,21 +4,14 @@ import {
   type PersonInsert,
   type PersonUpdate,
 } from '@/db/schema/person';
-import { and, count, eq, like } from 'drizzle-orm';
+import { and, eq, like } from 'drizzle-orm';
 import { newNotFoundError } from '../global/exception';
-import { users } from '@/db/schema/user';
 import {
   newInputPersonError,
   newInvalidRole,
   newPersonAlreadyExists,
 } from './person.exception';
-
-type PersonFilter = {
-  limit?: number;
-  offset?: number;
-  name?: string;
-  address?: string;
-};
+import type { PersonFilter } from './person.middleware';
 
 const assertExist = async (id: number, as?: 'male' | 'female') => {
   const exist = await db.query.persons.findFirst({
@@ -41,16 +34,23 @@ const getPersonByID = async (id: number) => {
 
 const getPersons = async (query: PersonFilter) => {
   const data = await db.query.persons.findMany({
+    columns: { createdAt: false, updatedAt: false },
     where: ({ name, address }, { and, like, eq }) =>
       and(
         query.name ? like(name, `%${query.name}%`) : undefined,
         query.address ? eq(address, query.address) : undefined,
       ),
-    limit: query.limit,
-    offset: query.offset,
+    limit: query.per_page,
+    offset: (query.page - 1) * query.per_page,
   });
 
-  const total = await db.$count(persons);
+  const total = await db.$count(
+    persons,
+    and(
+      query.name ? like(persons.name, `%${query.name}%`) : undefined,
+      query.address ? eq(persons.address, query.address) : undefined,
+    ),
+  );
 
   return { data, total };
 };

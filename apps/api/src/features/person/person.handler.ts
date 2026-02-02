@@ -5,13 +5,12 @@ import {
 } from '@/features/auth/auth.middleware';
 import {
   newPersonSchema,
-  searchQueryShema,
+  searchPersonShema,
   updatePersonSchema,
 } from './person.middleware';
 import personService from './person.service';
 import type { ApiResponse } from '@/types/response.type';
 import {
-  limitOffsetSchema,
   jsonValidator,
   paramValidator,
   queryValidator,
@@ -19,6 +18,7 @@ import {
 import z from 'zod';
 import type { PersonInsert, PersonUpdate } from '@/db/schema/person';
 import descendantService from '../descendant/descendant.service';
+import { metaBuilder } from '@/utils/builder';
 
 export const personRoute = new Hono()
   // GET BY ID
@@ -41,26 +41,17 @@ export const personRoute = new Hono()
   )
   // GET ALL + FILTER
   // todo :  bikin implement pagination -sama kaya users service-
-  .get(
-    '/',
-    queryValidator(searchQueryShema.extend(limitOffsetSchema.shape)),
-    async (c) => {
-      const query = c.req.valid('query');
+  .get('/', queryValidator(searchPersonShema), async (c) => {
+    const query = c.req.valid('query');
 
-      const { data, total } = await personService.getPersons(query);
-      // todo : nanti bikin util metaBuilder
+    const { data, total } = await personService.getPersons(query);
+    const meta = metaBuilder(total, query.page, query.per_page);
 
-      return c.json<ApiResponse<typeof data>>(
-        {
-          success: true,
-          code: 200,
-          data,
-          meta: { total },
-        },
-        200,
-      );
-    },
-  )
+    return c.json<ApiResponse<typeof data>>(
+      { success: true, code: 200, data, meta },
+      200,
+    );
+  })
   // ADD NEW PERSON
   .use(jwtMiddleware, adminMiddleware)
   .post('/', jsonValidator(newPersonSchema), async (c) => {
@@ -107,12 +98,33 @@ export const personRoute = new Hono()
     paramValidator(z.object({ id: z.coerce.number() })),
     async (c) => {
       const { id } = c.req.valid('param');
-      const data = descendantService.getParents(id);
-      return c.json<ApiResponse<typeof data>>({
-        success: true,
-        code: 200,
-        data,
-      });
+      const data = await descendantService.getParents(id);
+      return c.json<ApiResponse<typeof data>>(
+        {
+          success: true,
+          code: 200,
+          data,
+        },
+        200,
+      );
+    },
+  )
+  // GET CHILDREN
+  .get(
+    '/:id/children',
+    paramValidator(z.object({ id: z.coerce.number() })),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      console.log(id);
+      const data = await descendantService.getChildrens(id);
+      return c.json<ApiResponse<typeof data>>(
+        {
+          success: true,
+          code: 200,
+          data,
+        },
+        200,
+      );
     },
   );
 // todo : delete person feature.

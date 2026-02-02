@@ -7,7 +7,6 @@ export const errorHandler: ErrorHandler = (err, c) => {
     return c.text('INTERNAL ERROR', 500);
   }
 
-  // todo : rapihin typingnya
   const res = {
     success: false,
     code: err.status,
@@ -24,6 +23,6 @@ export const notFoundHandler: NotFoundHandler = (c) => {
       code: 404,
       message: 'LOST IN SPACE?',
     },
-    404
+    404,
   );
 };

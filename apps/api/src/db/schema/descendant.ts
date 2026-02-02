@@ -18,7 +18,7 @@ export const descendants = sqliteTable('descendant', {
 });
 
 export const descendantRelations = relations(descendants, ({ one }) => ({
-  user: one(persons, {
+  person: one(persons, {
     fields: [descendants.personId],
     references: [persons.id],
   }),

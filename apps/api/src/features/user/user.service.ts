@@ -1,7 +1,8 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { users } from '@/db/schema/user';
 import { newUserNotFound } from './user.exception';
+import type { UserFilter } from './user.middleware';
 
 const getUserProfile = async (username: string) => {
   const user = await db.query.users.findFirst({
@@ -15,14 +16,27 @@ const getUserProfile = async (username: string) => {
   return user;
 };
 
-const getAllUser = async (limit?: number, offset?: number) => {
-  const _users = await db.query.users.findMany({
+const getAllUser = async (query: UserFilter) => {
+  const data = await db.query.users.findMany({
     columns: { password: false },
-    limit: limit,
-    offset: offset,
+    where: ({ username, role }, { and, eq }) =>
+      and(
+        query.username ? eq(username, query.username) : undefined,
+        query.role ? eq(role, query.role) : undefined,
+      ),
+    limit: query.per_page,
+    offset: query.page,
   });
 
-  return _users;
+  const total = await db.$count(
+    users,
+    and(
+      query.username ? eq(users.username, query.username) : undefined,
+      query.role ? eq(users.role, query.role) : undefined,
+    ),
+  );
+
+  return { data, total };
 };
 
 export default { getUserProfile, getAllUser };

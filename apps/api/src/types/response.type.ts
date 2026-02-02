@@ -1,10 +1,16 @@
 import type { ContentfulStatusCode, StatusCode } from 'hono/utils/http-status';
 
+export interface Meta {
+  total_items: number;
+  current_page: number;
+  per_page: number;
+  total_pages: number;
+}
 export interface SuccessResponse<T = unknown> {
   success: true;
   code: ContentfulStatusCode;
   data?: T;
-  meta?: unknown;
+  meta?: Meta;
 }
 
 interface ErrorResponse<T = unknown> {

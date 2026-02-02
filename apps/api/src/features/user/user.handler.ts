@@ -7,6 +7,8 @@ import type { ApiResponse } from '@/types/response.type';
 import userService from './user.service';
 import { zValidator } from '@hono/zod-validator';
 import { limitOffsetSchema } from '../global/validator';
+import { searchUserSchema } from './user.middleware';
+import { metaBuilder } from '@/utils/builder';
 
 export const userRoutes = new Hono()
   .get('/me', jwtMiddleware, async (c) => {
@@ -30,14 +32,14 @@ export const userRoutes = new Hono()
     '/',
     jwtMiddleware,
     adminMiddleware,
-    zValidator('query', limitOffsetSchema), // todo : ganti jadi validator biasa aja, yang udah ada
+    zValidator('query', searchUserSchema), // todo : ganti jadi validator biasa aja, yang udah ada
     async (c) => {
-      const { limit, offset } = c.req.valid('query');
-      const data = await userService.getAllUser(limit, offset);
-      return c.json<ApiResponse<typeof data>>({
-        success: true,
-        code: 200,
-        data,
-      });
+      const query = c.req.valid('query');
+      const { data, total } = await userService.getAllUser(query);
+      const meta = metaBuilder(total, query.page, query.per_page);
+      return c.json<ApiResponse<typeof data>>(
+        { success: true, code: 200, data, meta },
+        200,
+      );
     },
   );

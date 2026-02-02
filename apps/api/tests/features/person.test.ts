@@ -1,21 +1,14 @@
 import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import {
-  generateToken,
-  queryCreatePersonTable,
-  queryCreateUserTable,
-  querySeedPersonTable,
-  querySeedUserTable,
-} from './utils';
+import { generateToken } from './utils';
 import { testClient } from 'hono/testing';
 import app from '@/index';
+import { migrations } from '../migrations.generated';
 
 describe('person test', () => {
   beforeAll(async () => {
-    await env.DB.prepare(queryCreatePersonTable).run();
-    await env.DB.prepare(queryCreateUserTable).run();
-    await env.DB.prepare(querySeedUserTable).run();
-    await env.DB.prepare(querySeedPersonTable).run();
+    const prepareds = Object.values(migrations).map((m) => env.DB.prepare(m));
+    await env.DB.batch(prepareds);
   });
 
   const client = testClient(app, env);
@@ -50,7 +43,7 @@ describe('person test', () => {
   it('should success get all person', async () => {
     const res = await client.person.$get({
       query: {
-        limit: 3,
+        per_page: 3,
       },
     });
 

@@ -3,8 +3,8 @@ import { validator } from 'hono/validator';
 import z, { string, unknown } from 'zod';
 
 export const limitOffsetSchema = z.object({
-  limit: z.coerce.number().optional(),
-  offset: z.coerce.number().min(1).optional(),
+  per_page: z.coerce.number().min(1).optional().default(10),
+  page: z.coerce.number().min(1).optional().default(1),
 });
 
 export const paramValidator = <T extends z.ZodRawShape>(
