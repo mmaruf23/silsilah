@@ -42,13 +42,12 @@ describe('person test', () => {
 
   it('should success get all person', async () => {
     const res = await client.person.$get({
-      query: {
-        per_page: 3,
-      },
+      query: {},
     });
 
     expect(res.status).toBe(200);
     const jsonResponse = await res.json();
+    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(200);
     expect(jsonResponse.success).toBe(true);
     if (jsonResponse.success) {

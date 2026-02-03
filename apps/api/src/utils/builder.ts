@@ -2,8 +2,8 @@ import type { Meta } from '@/types/response.type';
 
 export const metaBuilder = (
   total: number,
-  page: number,
-  per_page: number,
+  page: number = 1,
+  per_page: number = 10,
 ): Meta => ({
   total_items: total,
   current_page: page,

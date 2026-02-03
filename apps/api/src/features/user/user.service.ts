@@ -24,8 +24,8 @@ const getAllUser = async (query: UserFilter) => {
         query.username ? eq(username, query.username) : undefined,
         query.role ? eq(role, query.role) : undefined,
       ),
-    limit: query.per_page,
-    offset: (query.page - 1) * query.per_page,
+    limit: query.per_page || 10,
+    offset: (query.page || 1 - 1) * (query.per_page || 10),
   });
 
   const total = await db.$count(

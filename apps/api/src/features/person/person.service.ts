@@ -40,8 +40,8 @@ const getPersons = async (query: PersonFilter) => {
         query.name ? like(name, `%${query.name}%`) : undefined,
         query.address ? eq(address, query.address) : undefined,
       ),
-    limit: query.per_page,
-    offset: (query.page - 1) * query.per_page,
+    limit: query.per_page || 10,
+    offset: (query.page || 1 - 1) * (query.per_page || 10),
   });
 
   const total = await db.$count(
