@@ -4,6 +4,7 @@ import { userRelations, users } from './schema/user';
 import { personRelations, persons } from './schema/person';
 import { mariageRelations, mariages } from './schema/mariage';
 import { descendantRelations, descendants } from './schema/descendant';
+import { tokens } from './schema/token';
 
 export const db = drizzle(env.DB, {
   schema: {
@@ -15,5 +16,6 @@ export const db = drizzle(env.DB, {
     mariageRelations,
     descendants,
     descendantRelations,
+    tokens,
   },
 });

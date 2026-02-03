@@ -1,7 +1,8 @@
 import { db } from '@/db';
-import { users, type UserInsert } from '@/db/schema/user';
+import { users, type User, type UserInsert } from '@/db/schema/user';
 import {
   newInvalidCredential,
+  newInvalidTokenError,
   newRegisterError,
   newUserAlreadyExist,
 } from './auth.exception';
@@ -9,6 +10,8 @@ import { eq } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
 import { env } from 'cloudflare:workers';
+import type { PayloadrRefreshToken } from '@/types/payload.type';
+import { tokens } from '@/db/schema/token';
 
 const register = async (userInput: UserInsert) => {
   if (userInput.password)
@@ -44,16 +47,55 @@ const login = async ({
       throw newInvalidCredential();
   }
 
-  const token = await sign(
+  return user;
+};
+
+const issueAccessToken = async (user: User) => {
+  return await sign(
     {
-      sub: user.username,
+      sub: user.id,
+      username: user.username,
       role: user.role,
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 jam
     },
     env.JWT_SECRET,
   );
+};
 
-  return { token };
+const issueRefreshToken = async (sub: number) => {
+  const maxAge = 60 * 60 * 24 * 30; // 1 bulan
+  const expiresAt = new Date(Date.now() + maxAge);
+  const uuid = crypto.randomUUID();
+  const payload: PayloadrRefreshToken = {
+    sub,
+    jti: uuid,
+    exp: Math.floor(expiresAt.getTime() / 1000),
+  };
+
+  const refreshToken = await sign(payload, env.JWT_SECRET); // todo bikin secret khusus refresh token.
+
+  await db.insert(tokens).values({
+    id: uuid,
+    userId: sub,
+    expiresAt,
+  });
+
+  return { refreshToken, maxAge };
+};
+
+const getRefreshToken = async (payload: PayloadrRefreshToken) => {
+  const token = await db.query.tokens.findFirst({
+    where(fields, operators) {
+      return operators.eq(fields.id, payload.jti);
+    },
+  });
+
+  if (!token) throw newInvalidTokenError('invalid token format');
+  if (token.replacedBy) throw newInvalidTokenError('token is used');
+  if (token.revokedAt) throw newInvalidTokenError('token tidak sah');
+  if (token.expiresAt < new Date()) throw newInvalidTokenError('token expired');
+
+  return token;
 };
 
 // nanti kalau udah implement refresh token. baru bikin service logout.
@@ -61,4 +103,10 @@ const login = async ({
 
 // }
 
-export default { register, login };
+export default {
+  register,
+  login,
+  issueAccessToken,
+  issueRefreshToken,
+  getRefreshToken,
+};

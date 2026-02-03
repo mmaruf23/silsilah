@@ -13,3 +13,9 @@ export const newInvalidCredential = () => {
     message: 'username atau password salah',
   });
 };
+
+export const newInvalidTokenError = (m?: string) => {
+  return new HTTPException(400, {
+    message: m ?? 'Invalid token error',
+  });
+};
