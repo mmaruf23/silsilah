@@ -5,7 +5,6 @@ export default defineWorkersProject(() => {
   return {
     test: {
       globals: true,
-      // disable watch mode so tests run once
       watch: false,
       alias: {
         '@': path.resolve(__dirname, './src'),

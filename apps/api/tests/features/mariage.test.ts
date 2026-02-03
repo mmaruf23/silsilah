@@ -1,40 +1,38 @@
 import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import {
-  generateToken,
-  queryCreateDescendantTable,
-  queryCreateMariageTable,
-  queryCreatePersonTable,
-  queryCreateUserTable,
-  querySeedMariageTable,
-  querySeedPersonTable,
-  querySeedUserTable,
-} from './utils';
+import { generateToken } from './utils';
 import { testClient } from 'hono/testing';
 import app from '@/index';
+import { migrations } from '../migrations.generated';
+import { drizzle } from 'drizzle-orm/d1';
+import { persons } from '@/db/schema/person';
 
 describe('mariage test', () => {
   beforeAll(async () => {
-    await env.DB.prepare(queryCreatePersonTable).run();
-    await env.DB.prepare(queryCreateUserTable).run();
-    await env.DB.prepare(queryCreateMariageTable).run();
-    await env.DB.prepare(queryCreateDescendantTable).run();
-    await env.DB.prepare(querySeedPersonTable).run();
-    await env.DB.prepare(querySeedUserTable).run();
-    await env.DB.prepare(querySeedMariageTable).run();
+    const prepareds = Object.values(migrations).map((m) => env.DB.prepare(m));
+    await env.DB.batch(prepareds);
   });
 
   const client = testClient(app, env);
+  const db = drizzle(env.DB);
 
   it('should success add new mariage', async () => {
     const token = await generateToken(env.JWT_SECRET, true);
+    const [husband, wife] = await db
+      .insert(persons)
+      .values([
+        { name: 'husband', gender: 'male', address: 'st.test' },
+        { name: 'wife', gender: 'female', address: 'st.test' },
+      ])
+      .returning();
+
     const res = await client.mariage.$post(
       {
-        json: { husband_id: 1, wife_id: 3 },
+        json: { husband_id: husband.id, wife_id: wife.id },
       },
       {
         headers: {
-          authorization: `BEARER ${token}`,
+          authorization: `Bearer ${token}`,
         },
       },
     );
@@ -56,7 +54,7 @@ describe('mariage test', () => {
       },
       {
         headers: {
-          authorization: `BEARER ${token}`,
+          authorization: `Bearer ${token}`,
         },
       },
     );
@@ -77,7 +75,7 @@ describe('mariage test', () => {
       },
       {
         headers: {
-          authorization: `BEARER ${token}`,
+          authorization: `Bearer ${token}`,
         },
       },
     );
@@ -98,7 +96,7 @@ describe('mariage test', () => {
       },
       {
         headers: {
-          authorization: `BEARER ${token}`,
+          authorization: `Bearer ${token}`,
         },
       },
     );

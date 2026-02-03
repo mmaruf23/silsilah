@@ -25,7 +25,7 @@ const getAllUser = async (query: UserFilter) => {
         query.role ? eq(role, query.role) : undefined,
       ),
     limit: query.per_page,
-    offset: query.page,
+    offset: (query.page - 1) * query.per_page,
   });
 
   const total = await db.$count(
@@ -39,4 +39,14 @@ const getAllUser = async (query: UserFilter) => {
   return { data, total };
 };
 
-export default { getUserProfile, getAllUser };
+const findUserByID = async (id: number) => {
+  const user = await db.query.users.findFirst({
+    where(fields, operators) {
+      return operators.eq(fields.id, id);
+    },
+  });
+  if (!user) throw newUserNotFound();
+  return user;
+};
+
+export default { getUserProfile, getAllUser, findUserByID };

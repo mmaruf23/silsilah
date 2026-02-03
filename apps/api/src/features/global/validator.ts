@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception';
 import { validator } from 'hono/validator';
-import z, { string, unknown } from 'zod';
+import z from 'zod';
 
 export const limitOffsetSchema = z.object({
   per_page: z.coerce.number().min(1).optional().default(10),

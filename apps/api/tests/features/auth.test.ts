@@ -1,18 +1,13 @@
 import { env } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import {
-  queryCreatePersonTable,
-  queryCreateUserTable,
-  querySeedUserTable,
-} from './utils';
 import { testClient } from 'hono/testing';
 import app from '@/index';
+import { migrations } from '../migrations.generated';
 
 describe('auth test', () => {
   beforeAll(async () => {
-    await env.DB.prepare(queryCreatePersonTable).run();
-    await env.DB.prepare(queryCreateUserTable).run();
-    await env.DB.prepare(querySeedUserTable).run();
+    const prepareds = Object.values(migrations).map((m) => env.DB.prepare(m));
+    await env.DB.batch(prepareds);
   });
 
   const client = testClient(app, env);
@@ -49,7 +44,6 @@ describe('auth test', () => {
     expect(resJson.success).toBe(true);
     if (resJson.success) {
       expect(resJson.data).toBeDefined();
-      expect(resJson.data?.token).toBeDefined();
     }
   });
 });

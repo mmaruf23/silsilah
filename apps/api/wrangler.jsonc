@@ -8,6 +8,8 @@
   // ],
   "vars": {
     "JWT_SECRET": "iniprivatekey",
+    "JWT_REFRESH_SECRET": "iniprivaterefreshsecret",
+    "MAX_AGE_JWT_REFRESH": 2592000, // 1 bulan
   },
   // "kv_namespaces": [
   //   {

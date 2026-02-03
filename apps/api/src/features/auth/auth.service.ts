@@ -11,7 +11,8 @@ import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
 import { env } from 'cloudflare:workers';
 import type { PayloadrRefreshToken } from '@/types/payload.type';
-import { tokens } from '@/db/schema/token';
+import { tokens, type Token } from '@/db/schema/token';
+import { newNotFoundError } from '../global/exception';
 
 const register = async (userInput: UserInsert) => {
   if (userInput.password)
@@ -63,8 +64,7 @@ const issueAccessToken = async (user: User) => {
 };
 
 const issueRefreshToken = async (sub: number) => {
-  const maxAge = 60 * 60 * 24 * 30; // 1 bulan
-  const expiresAt = new Date(Date.now() + maxAge);
+  const expiresAt = new Date(Date.now() + env.MAX_AGE_JWT_REFRESH);
   const uuid = crypto.randomUUID();
   const payload: PayloadrRefreshToken = {
     sub,
@@ -80,33 +80,66 @@ const issueRefreshToken = async (sub: number) => {
     expiresAt,
   });
 
-  return { refreshToken, maxAge };
+  return { refreshToken, jti: uuid };
 };
 
-const getRefreshToken = async (payload: PayloadrRefreshToken) => {
-  const token = await db.query.tokens.findFirst({
+const rotateToken = async (payload: PayloadrRefreshToken) => {
+  const oldToken = await db.query.tokens.findFirst({
     where(fields, operators) {
       return operators.eq(fields.id, payload.jti);
     },
   });
 
-  if (!token) throw newInvalidTokenError('invalid token format');
-  if (token.replacedBy) throw newInvalidTokenError('token is used');
-  if (token.revokedAt) throw newInvalidTokenError('token tidak sah');
-  if (token.expiresAt < new Date()) throw newInvalidTokenError('token expired');
+  if (!oldToken) throw newInvalidTokenError('invalid token format');
+  if (oldToken.replacedBy) throw newInvalidTokenError('token is used');
+  if (oldToken.revokedAt) throw newInvalidTokenError('token tidak sah');
+  if (oldToken.expiresAt < new Date())
+    throw newInvalidTokenError('token expired'); // just in case
 
-  return token;
+  const { refreshToken, jti } = await issueRefreshToken(oldToken.userId);
+
+  await db
+    .update(tokens)
+    .set({
+      replacedBy: jti,
+      revokedAt: new Date(),
+    })
+    .where(eq(tokens.id, oldToken.id));
+
+  return refreshToken;
 };
 
-// nanti kalau udah implement refresh token. baru bikin service logout.
-// const logout = async (token: string) => {
+const logout = async (payload: PayloadrRefreshToken) => {
+  const status = await db
+    .update(tokens)
+    .set({
+      revokedAt: new Date(),
+    })
+    .where(eq(tokens.id, payload.jti));
 
-// }
+  if (!status.meta.changes)
+    throw newNotFoundError('failed logout, cannot found any account');
+};
+
+const logoutAll = async (payload: PayloadrRefreshToken) => {
+  const status = await db
+    .update(tokens)
+    .set({
+      revokedAt: new Date(),
+    })
+    .where(eq(tokens.userId, payload.sub));
+
+  if (!status.meta.changes)
+    throw newNotFoundError(
+      'failed logout all devices, cannot fount any account',
+    );
+};
 
 export default {
   register,
   login,
   issueAccessToken,
   issueRefreshToken,
-  getRefreshToken,
+  rotateToken,
+  logout,
 };

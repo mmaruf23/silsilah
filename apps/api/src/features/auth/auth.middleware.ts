@@ -4,6 +4,10 @@ import type { ApiResponse } from '@/types/response.type';
 import type { MiddlewareHandler } from 'hono';
 
 export const jwtMiddleware = jwt({ secret: env.JWT_SECRET });
+export const refreshTokenMiddleware = jwt({
+  secret: env.JWT_SECRET,
+  cookie: 'refresh_token',
+});
 
 /**
  * hanya bisa bekerja setelah loginValidator

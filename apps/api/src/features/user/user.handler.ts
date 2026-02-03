@@ -6,7 +6,6 @@ import {
 import type { ApiResponse } from '@/types/response.type';
 import userService from './user.service';
 import { zValidator } from '@hono/zod-validator';
-import { limitOffsetSchema } from '../global/validator';
 import { searchUserSchema } from './user.middleware';
 import { metaBuilder } from '@/utils/builder';
 
