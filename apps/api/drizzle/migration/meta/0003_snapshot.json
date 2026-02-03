@@ -1,8 +1,8 @@
 {
+  "id": "12e94b21-7557-493a-808a-cd9098d064bf",
+  "prevId": "f1db7763-71e2-423f-b121-f6c045515bbd",
   "version": "6",
   "dialect": "sqlite",
-  "id": "af5d2282-feec-4093-8671-24f6f00fa4f4",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "descendant": {
       "name": "descendant",
@@ -48,28 +48,28 @@
         "descendant_person_id_persons_id_fk": {
           "name": "descendant_person_id_persons_id_fk",
           "tableFrom": "descendant",
-          "tableTo": "persons",
           "columnsFrom": [
             "person_id"
           ],
+          "tableTo": "persons",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "descendant_mariage_id_mariage_id_fk": {
           "name": "descendant_mariage_id_mariage_id_fk",
           "tableFrom": "descendant",
-          "tableTo": "mariage",
           "columnsFrom": [
             "mariage_id"
           ],
+          "tableTo": "mariage",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -143,28 +143,28 @@
         "mariage_husband_id_persons_id_fk": {
           "name": "mariage_husband_id_persons_id_fk",
           "tableFrom": "mariage",
-          "tableTo": "persons",
           "columnsFrom": [
             "husband_id"
           ],
+          "tableTo": "persons",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         },
         "mariage_wife_id_persons_id_fk": {
           "name": "mariage_wife_id_persons_id_fk",
           "tableFrom": "mariage",
-          "tableTo": "persons",
           "columnsFrom": [
             "wife_id"
           ],
+          "tableTo": "persons",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -321,15 +321,15 @@
         "users_person_id_persons_id_fk": {
           "name": "users_person_id_persons_id_fk",
           "tableFrom": "users",
-          "tableTo": "persons",
           "columnsFrom": [
             "person_id"
           ],
+          "tableTo": "persons",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -340,9 +340,9 @@
   "views": {},
   "enums": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   },
   "internal": {
     "indexes": {}

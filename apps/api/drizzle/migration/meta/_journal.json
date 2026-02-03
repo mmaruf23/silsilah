@@ -5,8 +5,43 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1769957625353,
+      "when": 1770109626655,
       "tag": "0000_create_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1770109636991,
+      "tag": "0001_seed_person_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1770109648832,
+      "tag": "0002_seed_user_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1770109656750,
+      "tag": "0003_seed_mariage_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1770109666832,
+      "tag": "0004_seed_descendant_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1770109698328,
+      "tag": "0005_create_tokens_table",
       "breakpoints": true
     }
   ]
