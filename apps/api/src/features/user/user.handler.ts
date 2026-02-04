@@ -5,16 +5,16 @@ import {
 } from '@/features/auth/auth.middleware';
 import type { ApiResponse } from '@/types/response.type';
 import userService from './user.service';
-import { zValidator } from '@hono/zod-validator';
 import { searchUserSchema } from './user.middleware';
 import { metaBuilder } from '@/utils/builder';
+import { queryValidator } from '../global/validator';
+import type { PayloadAccessToken } from '@/types/payload.type';
 
 export const userRoutes = new Hono()
   .get('/me', jwtMiddleware, async (c) => {
-    const { sub } = c.get('jwtPayload') as { sub: string };
+    const { username } = c.get('jwtPayload') as PayloadAccessToken;
 
-    const data = await userService.getUserProfile(sub);
-    // todo: logout if not found. just in case
+    const data = await userService.getUserProfile(username);
 
     return c.json<ApiResponse<typeof data>>({
       success: true,
@@ -22,16 +22,12 @@ export const userRoutes = new Hono()
       data,
     });
   })
-  /** todo :
-   * [ ] bikin implement pagination,
-   * [x] authorize hanya khusus admin
-   *  */
 
   .get(
     '/',
     jwtMiddleware,
     adminMiddleware,
-    zValidator('query', searchUserSchema), // todo : ganti jadi validator biasa aja, yang udah ada
+    queryValidator(searchUserSchema),
     async (c) => {
       const query = c.req.valid('query');
       const { data, total } = await userService.getAllUser(query);

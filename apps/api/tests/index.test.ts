@@ -16,4 +16,10 @@ describe('test unit test', () => {
     console.log(p);
     expect(true).toBe(true);
   });
+
+  it('idk', async () => {
+    const res = client.person[':id'].$delete({
+      param: { id: '1' },
+    });
+  });
 });

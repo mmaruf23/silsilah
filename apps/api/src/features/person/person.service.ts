@@ -83,10 +83,18 @@ const editPerson = async (id: number, _person: PersonUpdate) => {
   return result[0];
 };
 
+const deletePerson = async (id: number) => {
+  const result = await db.delete(persons).where(eq(persons.id, id));
+
+  if (!result.meta.changes)
+    throw newNotFoundError(`person with id ${id} not found or already deleted`);
+};
+
 export default {
   getPersonByID,
   getPersons,
   addPerson,
   editPerson,
   assertExist,
+  deletePerson,
 };

@@ -5,16 +5,19 @@ import { sign } from 'hono/jwt';
  *
  * @param JWT_SECRET
  * @param admin default false
+ * @param sub default 1
  * @returns promised string token
  */
-export const generateToken = (JWT_SECRET: string, admin: boolean = false) => {
+export const generateToken = (
+  JWT_SECRET: string,
+  admin: boolean = false,
+  sub?: number,
+) => {
   const payload: PayloadAccessToken = {
-    sub: 1,
-    role: 'admin',
+    sub: sub ?? 1,
+    role: admin ? 'admin' : 'user',
     username: 'admin',
     exp: Math.floor(Date.now() / 1000) + 3600,
   };
   return sign(payload, JWT_SECRET);
 };
-
-// next : update type start_date sama end_date mariage jadi tipe integer-date. biar bisa dipake ngitung usia pernikahan.

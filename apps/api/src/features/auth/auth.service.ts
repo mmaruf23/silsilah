@@ -10,7 +10,10 @@ import { eq } from 'drizzle-orm';
 import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
 import { env } from 'cloudflare:workers';
-import type { PayloadrRefreshToken } from '@/types/payload.type';
+import type {
+  PayloadAccessToken,
+  PayloadrRefreshToken,
+} from '@/types/payload.type';
 import { tokens, type Token } from '@/db/schema/token';
 import { newNotFoundError } from '../global/exception';
 
@@ -72,7 +75,7 @@ const issueRefreshToken = async (sub: number) => {
     exp: Math.floor(expiresAt.getTime() / 1000),
   };
 
-  const refreshToken = await sign(payload, env.JWT_SECRET); // todo bikin secret khusus refresh token.
+  const refreshToken = await sign(payload, env.JWT_REFRESH_SECRET);
 
   await db.insert(tokens).values({
     id: uuid,
@@ -121,7 +124,7 @@ const logout = async (payload: PayloadrRefreshToken) => {
     throw newNotFoundError('failed logout, cannot found any account');
 };
 
-const logoutAll = async (payload: PayloadrRefreshToken) => {
+const logoutAll = async (payload: PayloadAccessToken) => {
   const status = await db
     .update(tokens)
     .set({
@@ -131,7 +134,7 @@ const logoutAll = async (payload: PayloadrRefreshToken) => {
 
   if (!status.meta.changes)
     throw newNotFoundError(
-      'failed logout all devices, cannot fount any account',
+      'failed logout all devices, cannot found any account',
     );
 };
 
@@ -142,4 +145,5 @@ export default {
   issueRefreshToken,
   rotateToken,
   logout,
+  logoutAll,
 };

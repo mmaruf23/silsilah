@@ -27,7 +27,7 @@ describe('person test', () => {
       },
       {
         headers: {
-          Authorization: `BEARER ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       },
     );
@@ -47,7 +47,6 @@ describe('person test', () => {
 
     expect(res.status).toBe(200);
     const jsonResponse = await res.json();
-    console.log(jsonResponse);
     expect(jsonResponse.code).toBe(200);
     expect(jsonResponse.success).toBe(true);
     if (jsonResponse.success) {
@@ -121,6 +120,7 @@ describe('person test', () => {
   });
 
   it('should success update person', async () => {
+    const token = await generateToken(env.JWT_SECRET, true);
     const res = await client.person[':id'].$put(
       {
         param: { id: '1' },
@@ -131,7 +131,7 @@ describe('person test', () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${await generateToken(env.JWT_SECRET, true)}`,
+          Authorization: `Bearer ${token}`,
         },
       },
     );
@@ -142,6 +142,75 @@ describe('person test', () => {
     if (jsonResponse.success) {
       expect(jsonResponse.data).toBeDefined();
       expect(jsonResponse.data?.fullname).toBe('Yukinoshita Yukino');
+    }
+  });
+
+  it('should success update person even not an admin', async () => {
+    const token = await generateToken(env.JWT_SECRET, false, 1);
+    const res = await client.person[':id'].$put(
+      {
+        param: { id: '1' },
+        json: {
+          fullname: 'Yukinoshita Yukino',
+          birthDate: '1995-01-03',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const jsonResponse = await res.json();
+    expect(jsonResponse.code).toBe(200);
+    expect(jsonResponse.success).toBe(true);
+    if (jsonResponse.success) {
+      expect(jsonResponse.data).toBeDefined();
+      expect(jsonResponse.data?.fullname).toBe('Yukinoshita Yukino');
+    }
+  });
+
+  it('should fail update person couse not user profile and not an admin', async () => {
+    const token = await generateToken(env.JWT_SECRET, false, 2);
+    const res = await client.person[':id'].$put(
+      {
+        param: { id: '1' },
+        json: {
+          fullname: 'Yukinoshita Yukino',
+          birthDate: '1995-01-03',
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const jsonResponse = await res.json();
+    expect(jsonResponse.code).toBe(401);
+    expect(jsonResponse.success).toBe(false);
+  });
+
+  it('should success delete person', async () => {
+    const token = await generateToken(env.JWT_SECRET, true);
+    const res = await client.person[':id'].$delete(
+      {
+        param: { id: '1' },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const jsonResponse = await res.json();
+    expect(jsonResponse.success).toBe(true);
+    expect(jsonResponse.code).toBe(200);
+    if (jsonResponse.success) {
+      expect(jsonResponse.data).toBe('SUCCESS DELETED');
     }
   });
 });
