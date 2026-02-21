@@ -8,6 +8,7 @@
   // ],
   "vars": {
     "MAX_AGE_JWT_REFRESH": 2592000, // 1 bulan
+    "CORS_ORIGINS": "http://localhost:5173,https://silsilah.pages.dev",
   },
   // "kv_namespaces": [
   //   {

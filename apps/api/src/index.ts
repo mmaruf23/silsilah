@@ -6,12 +6,13 @@ import { personRoute } from './features/person/person.handler';
 import { cors } from 'hono/cors';
 import { mariageRoute } from './features/mariage/mariage.handler';
 import { descendantRoute } from './features/descendant/descendant.handler';
+import { env } from 'cloudflare:workers';
 
 const app = new Hono()
   .use(
     '/*',
     cors({
-      origin: 'http://localhost:5173',
+      origin: env.CORS_ORIGINS.split(',').map((s) => s.trim()),
       credentials: true,
     }),
   )
