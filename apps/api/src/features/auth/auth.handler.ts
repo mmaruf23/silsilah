@@ -13,10 +13,6 @@ const authRequestSchema = z.object({
   password: z.string().min(6).nullable(),
 });
 
-const cookieRefreshTokenSchema = z.object({
-  refresh_token: z.string(),
-});
-
 export const authRoutes = new Hono<{ Bindings: CloudflareBindings }>()
   .post('/register', jsonValidator(authRequestSchema), async (c) => {
     const req = c.req.valid('json');
@@ -68,7 +64,7 @@ export const authRoutes = new Hono<{ Bindings: CloudflareBindings }>()
         success: true,
         data: data,
       },
-      200,
+      201,
     );
   })
   .post('/logout', refreshTokenMiddleware, async (c) => {
