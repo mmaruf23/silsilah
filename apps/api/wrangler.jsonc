@@ -1,14 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "api",
+  "name": "silsilah",
   "main": "src/index.ts",
   "compatibility_date": "2025-12-17",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
   "vars": {
-    "JWT_SECRET": "iniprivatekey",
-    "JWT_REFRESH_SECRET": "iniprivaterefreshsecret",
     "MAX_AGE_JWT_REFRESH": 2592000, // 1 bulan
   },
   // "kv_namespaces": [
@@ -26,16 +24,16 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "my-database",
-      "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "database_name": "SILSILAH",
+      "database_id": "0e26b04d-47eb-49a0-b232-44b7c2d88170",
       "migrations_dir": "drizzle/migration",
     },
   ],
   // "ai": {
   //   "binding": "AI"
   // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
 }
